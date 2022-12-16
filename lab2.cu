@@ -6,9 +6,12 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <chrono>
+#include <iomanip>
 #include <cuda.h>
 
 using namespace std;
+using namespace std::chrono;
 
 double *X, *X_next; // искомые данные (x_1, x_2, y, phi1, phi2)
 
@@ -16,13 +19,12 @@ double *X, *X_next; // искомые данные (x_1, x_2, y, phi1, phi2)
 __device__ int counter = 0; // счётчик того, что все уравнения стали меньше порога e (пока он меньше 5 сидим в цикле)
 __device__ const double e = 0.000001; // порог для уравнений
 __device__ const double delta_tau = 0.005; // шаг по фиктивному времени для алгоритма (внутренний цикл)
-__device__ const double delta_t = 0.001; // шаг по реальному времени для алгоритма (внешний цикл)
+__device__ const double delta_t = 0.01; // шаг по реальному времени для алгоритма (внешний цикл)
 
 __device__ const double p = 2000; // давление внутри баллона
 __device__ const double m = 100; // масса
 __device__ const double g = 9.780; // ускорени свободного падения
 __device__ const double t_max = 2.5; // предел времени моделирования
-// __device__ const int n = t_max/delta_t; // число проходов внешнего цикла
 __device__ double n = 0;
 __device__ double l; // расстояние между точками x_1 и x_2
 
@@ -82,7 +84,6 @@ __global__ void Routine(double X[], double X_next[]){ // функция, зап�
             n += delta_t;
             printf("%f %f %f %f %f %f\n", X[0], X[1], X[2], X[3], X[4], A_y);
             // printf("%f %f %f %f %f %f %f %f %f %f %f %f\n", X[0], X[1], X[2], X[3], X[4], A_x, B_x, A_y, B_y, C, l, v);
-            // cout << X[0] << " " << X[1] << " " << X[2] << " " << X[3] << " " << X[4] << " " << A_x << " " << B_x << " " << A_y << " " << B_y  << " " << C << " " << l << " " << v << endl;     
         }
         update_A(X);
         __syncthreads();
@@ -99,8 +100,14 @@ int main() {
         X_next[i] = 0; // ==> X_next=[0,0,0,0,0]
     }
 
+    auto start = high_resolution_clock::now();
+
     Routine<<<block_count, thread_count>>>(X, X_next); // вызов девайсной функции (передаём число блоков и число потоков в блоке)
     cudaDeviceSynchronize();
+
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<nanoseconds>(stop - start);
+    // cout << fixed << setprecision(12) << duration.count() * 1e-9 << endl;
 
     // for (int i=0; i<5; ++i) // вывод посчитанного массива
     //     printf("%f\n", X[i]);
