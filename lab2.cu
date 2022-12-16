@@ -102,8 +102,8 @@ int main() {
     Routine<<<block_count, thread_count>>>(X, X_next); // вызов девайсной функции (передаём число блоков и число потоков в блоке)
     cudaDeviceSynchronize();
 
-    for (int i=0; i<5; ++i) // вывод посчитанного массива
-        printf("%f\n", X[i]);
+    // for (int i=0; i<5; ++i) // вывод посчитанного массива
+    //     printf("%f\n", X[i]);
 
     cudaFree(X); // освобождение памяти
     cudaFree(X_next);
