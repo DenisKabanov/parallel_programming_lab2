@@ -23,16 +23,16 @@ __device__ const double delta_t = 0.01; // шаг по реальному вре
 
 __device__ const double p = 2000; // давление внутри баллона
 __device__ const double m = 100; // масса
-__device__ const double g = 9.780; // ускорени свободного падения
+__device__ const double g = 9.780; // ускорение свободного падения
 __device__ const double t_max = 2.5; // предел времени моделирования
 __device__ double n = 0;
 __device__ double l; // расстояние между точками x_1 и x_2
 
 __device__ double A_y = 0.3; // значения A_y для задания на 5
-__device__ double v = 0, v_next = 0; // скорость для залания 5
+__device__ double v = 0, v_next = 0; // скорость для задания 5
 __device__ double A_x = -0.353, B_x = 0.353, B_y = 0.3, C = 1.178;
 
-int thread_count = 1; // число потоков (в блоке), 1 поток на 1 уроавнение
+int thread_count = 1; // число потоков (в блоке), 1 поток на 1 уравнение
 int block_count = 1; // число блоков
 
 __device__ double F(double X[], const int& i){
