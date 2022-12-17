@@ -1,2 +1,2 @@
 nvcc lab2.cu -o lab2.out
-lab2.out
+lab2.out > results/log.txt
